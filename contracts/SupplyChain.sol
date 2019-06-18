@@ -110,7 +110,7 @@ contract SupplyChain {
   {
   // var i = items[_sku];
   items[_sku].buyer = msg.sender;
-  items[_sku].seller.transfer(msg.value);
+  items[_sku].seller.transfer(items[_sku].price);
 
   items[_sku].state = State.Sold;
   emit LogSold(_sku);
@@ -122,13 +122,19 @@ contract SupplyChain {
   is the seller. Change the state of the item to shipped. Remember to call the event associated with this function!*/
   function shipItem(uint sku)
     public sold (sku) verifyCaller(items[sku].seller)
-  {}
+  {
+      items[sku].state = State.Shipped;
+      emit LogShipped(sku);
+  }
 
   /* Add 2 modifiers to check if the item is shipped already, and that the person calling this function
   is the buyer. Change the state of the item to received. Remember to call the event associated with this function!*/
   function receiveItem(uint sku)
     public shipped(sku) verifyCaller(items[sku].buyer)
-  {}
+  {
+      items[sku].state = State.Received;
+      emit LogReceived(sku);
+  }
 
   /* We have these functions completed so we can run tests, just ignore it :) */
   function fetchItem(uint _sku) public view returns (string memory name, uint sku, uint price, uint state, address seller, address buyer) {
